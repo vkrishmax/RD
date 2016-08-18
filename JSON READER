@@ -1,0 +1,201 @@
+Read JSON Object Using Jackson in Java
+
+Jackson is a multi-purpose Java library for processing JSON. Jackson aims to be the best possible combination of fast, correct, lightweight, and ergonomic for developers. This article explains how to use Jackson library to read and parse a JSON file. We are reading the following JSON content. 
+
+ 
+{
+  "testName" : "Login",
+  "testModule" : "Dashboard",
+  "testType" : "Regression",
+  "testSteps" : [ {
+    "id" : 1,
+    "step" : "Open Browser"
+  }, {
+    "id" : 2,
+    "step" : "Enter user name"
+  }, {
+    "id" : 3,
+    "step" : "Enter user password"
+  }, {
+    "id" : 4,
+    "step" : "Click on Login button"
+  } ],
+  "verification" : "Logout link should display",
+  "note" : ""
+}
+Create a maven-based project and add the Jackson library dependency in the pom.xml file
+
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+    <version>2.4.0</version>
+</dependency>
+Create TestSteps and TestCases class with Jackson annotations.
+
+TestSteps.java
+
+package com.example.Json;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TestStepsJacksonAnnotation {
+    @JsonProperty("Id")
+    private int Id;
+    @JsonProperty("Step")
+    private String Step;
+
+    public TestStepsJacksonAnnotation() {
+    }
+
+    public TestStepsJacksonAnnotation(int id, String step) {
+        Id = id;
+        Step = step;
+    }
+    public int getId() {
+        return Id;
+    }
+
+    public void setId(int id) {
+        Id = id;
+    }
+
+    public String getStep() {
+        return Step;
+    }
+
+    public void setStep(String step) {
+        Step = step;
+    }
+}
+TestCases.java
+
+package com.example.Json;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TestCasesJacksonAnnotation {
+    @JsonProperty("TestName")
+    private String TestName;
+    @JsonProperty("TestModule")
+    private String TestModule;
+    @JsonProperty("TestType")
+    private String TestType;
+    @JsonProperty("TestSteps")
+    private List TestSteps;
+    @JsonProperty("Verification")
+    private String Verification;
+    @JsonProperty("Note")
+    private String Note;
+
+    public TestCasesJacksonAnnotation() {
+    }
+
+    public TestCasesJacksonAnnotation(String testName, String testModule, String testType, List<com.example.Json.TestSteps> testSteps, String verification, String note) {
+        TestName = testName;
+        TestModule = testModule;
+        TestType = testType;
+        TestSteps = testSteps;
+        Verification = verification;
+        Note = note;
+    }
+
+    public String getTestName() {
+        return TestName;
+    }
+
+    public void setTestName(String testName) {
+        TestName = testName;
+    }
+
+    public String getTestModule() {
+        return TestModule;
+    }
+
+    public void setTestModule(String testModule) {
+        TestModule = testModule;
+    }
+
+    public String getTestType() {
+        return TestType;
+    }
+
+    public void setTestType(String testType) {
+        TestType = testType;
+    }
+
+    public List<com.example.Json.TestSteps> getTestSteps() {
+        return TestSteps;
+    }
+
+    public void setTestSteps(List<com.example.Json.TestSteps> testSteps) {
+        TestSteps = testSteps;
+    }
+
+    public String getVerification() {
+        return Verification;
+    }
+
+    public void setVerification(String verification) {
+        Verification = verification;
+    }
+
+    public String getNote() {
+        return Note;
+    }
+
+    public void setNote(String note) {
+        Note = note;
+    }
+}
+Write the following code in the class "ReadJsonWithJackson.java"
+
+package com.example.Json;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+public class ReadJsonWithJackson {
+    public static void main(String[] args)
+    {
+        ObjectMapper objectMapper=new ObjectMapper();
+        try {
+            System.out.println("Reading JSON from a file");
+            System.out.println("----------------------------");
+            //convert the json string back to object
+            TestCasesJacksonAnnotation testCasesObj = objectMapper.readValue(new File("testJackson.json"), TestCasesJacksonAnnotation.class);
+
+            System.out.println("Name Of Test Name: "+testCasesObj.getTestName());
+            System.out.println("Name of Test Module: "+testCasesObj.getTestModule());
+            System.out.println("Name of Test Type: "+testCasesObj.getTestType());
+            System.out.println("Name of Test Verification: "+testCasesObj.getVerification());
+            System.out.println("Test Steps are :");
+
+            List listOfTestSteps = testCasesObj.getTestSteps();
+            for (int i = 0; i < listOfTestSteps.size(); i++) {
+                System.out.println("Id: " +listOfTestSteps.get(i).getId() + "   Step:  " + listOfTestSteps.get(i).getStep());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+Run the code and see the result on the console output. A file "testJackson.json" content is read and displayed on the console. 
+
+Reading JSON from a file
+----------------------------
+Name Of Test Name: Login
+Name of Test Module: Dashboard
+Name of Test Type: Regression
+Name of Test Verification: Logout link should display
+Test Steps are :
+Id: 1   Step:  Open Browser
+Id: 2   Step:  Enter user name
+Id: 3   Step:  Enter user password
+Id: 4   Step:  Click on Login button
